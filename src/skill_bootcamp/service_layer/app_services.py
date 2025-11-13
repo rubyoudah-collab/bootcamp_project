@@ -1,7 +1,7 @@
 """Implements AppServices Class."""
 
-from application_name.application_base import ApplicationBase
-from application_name.persistence_layer.mysql_persistence_wrapper import MySQLPersistenceWrapper
+from skill_bootcamp.application_base import ApplicationBase
+from skill_bootcamp.persistence_layer.mysql_persistence_wrapper import MySQLPersistenceWrapper
 import inspect
 
 class AppServices(ApplicationBase):

@@ -2,7 +2,7 @@
 
 import json
 from argparse import ArgumentParser
-from application_name.presentation_layer.user_interface import UserInterface
+from skill_bootcamp.presentation_layer.user_interface import UserInterface
 
 
 
@@ -26,7 +26,7 @@ def configure_and_parse_commandline_arguments():
 	parser = ArgumentParser(
 	prog='main.py',
 	description='Start the application with a configuration file.',
-	epilog='POC: Your Name | your@email')
+	epilog='POC: rubyoudah-collab | Rubyoudah@gmail.com')
 
 	parser.add_argument('-c','--configfile',
 					help="Configuration file to load.",
