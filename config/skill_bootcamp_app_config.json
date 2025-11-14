@@ -13,10 +13,11 @@
     },
     "connection": {
       "config": {
-        "database": "database_name",
-        "user": "database_username",
+        "database": "skill_bootcamp",
+        "user": "root",
+        "password": "root",
         "host": "localhost",
-        "port": 8889
+        "port": 3306
       }
     }
   }

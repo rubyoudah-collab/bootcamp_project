@@ -1,2 +1,6 @@
+/* *************************************************************
+Drop and Recreate the database.
+*************************************************************** */
+
 DROP DATABASE IF EXISTS skill_bootcamp;
 CREATE DATABASE IF NOT EXISTS skill_bootcamp;
