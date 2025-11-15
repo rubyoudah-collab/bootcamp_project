@@ -1,6 +1,6 @@
 """Defines the MySQLPersistenceWrapper class."""
 
-from application_name.application_base import ApplicationBase
+from skill_bootcamp.application_base import ApplicationBase
 from mysql import connector
 from mysql.connector.pooling import (MySQLConnectionPool)
 import inspect
@@ -23,6 +23,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 		self.DB_CONFIG['database'] = \
 			self.DATABASE["connection"]["config"]["database"]
 		self.DB_CONFIG['user'] = self.DATABASE["connection"]["config"]["user"]
+		self.DB_CONFIG['password'] = self.DATABASE["connection"]["config"]["password"]
 		self.DB_CONFIG['host'] = self.DATABASE["connection"]["config"]["host"]
 		self.DB_CONFIG['port'] = self.DATABASE["connection"]["config"]["port"]
 

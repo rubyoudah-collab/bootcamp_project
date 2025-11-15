@@ -1,0 +1,24 @@
+{
+	"meta":{
+		"version": "v1",
+		"app_name": "Skill Bootcamp",
+		"log_prefix": "skill_bootcamp"
+	},
+	"database":{
+		"pool":{
+			"name": "skill_bootcamp_db_pool",
+			"size": 10,
+			"reset_session": true,
+			"use_pure": true
+		},
+		"connection":{
+			"config":{
+				"database": "skill_bootcamp",
+				"user": "root",
+				"password": "root",
+				"host": "localhost",
+				"port": 3306
+			}
+		}
+	}
+}
