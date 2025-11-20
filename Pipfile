@@ -7,7 +7,7 @@ name = "pypi"
 mysql-connector-python = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.13"
-
