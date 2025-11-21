@@ -1,9 +1,19 @@
-/* ******************************************************
-Insert test data into the skill_bootcamp database.
-********************************************************/
+SET FOREIGN_KEY_CHECKS=0;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Switch to the skill_bootcamp database.
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+-- ADD YOUR CODE HERE ----
 USE skill_bootcamp;
+-- --------------------------------------------------------
+
+
 
 -- Insert data into the cohorts table.
 INSERT INTO cohorts (cohort_name, start_date, end_date) VALUES
@@ -100,3 +110,8 @@ INSERT INTO student_module_xref (student_id, module_id, status) VALUES
 (18, 16, 'Completed'),
 (19, 17, 'In Progress'),
 (20, 18, 'In Progress');
+
+COMMIT;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
