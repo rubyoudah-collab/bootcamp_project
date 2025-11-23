@@ -4,7 +4,7 @@ import json
 from argparse import ArgumentParser
 from skill_bootcamp.presentation_layer.user_interface import UserInterface
 from skill_bootcamp.service_layer.app_services import AppServices
-
+from skill_bootcamp.presentation_layer.console_ui import ConsoleUI
 
 
 def main():
@@ -16,9 +16,8 @@ def main():
 		with open(args.configfile, 'r') as f:
 			config = json.loads(f.read())
 
-	service_layer = AppServices(config)
-	students_list = service_layer.get_all_students()
-	print(f"{students_list}")
+	ui = ConsoleUI(config)
+	ui.start()
 
 def configure_and_parse_commandline_arguments():
 	"""Configure and parse command-line arguments."""

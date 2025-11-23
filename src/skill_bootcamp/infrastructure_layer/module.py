@@ -7,6 +7,7 @@ class Module:
         self.id = 0
         self.module_name = ""
         self.description = ""
+        self.status = ""
 
     def __str__(self)-> str:
         return self.to_json()
@@ -19,5 +20,6 @@ class Module:
         supplier_dict["id"] = self.id
         supplier_dict["module_name"] = self.module_name
         supplier_dict["description"] = self.description
+        supplier_dict["status"] = self.status
 
         return json.dumps(supplier_dict)

@@ -40,7 +40,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 		
 		# Module Column ENUMS
 		self.ModuleColumns = \
-			Enum('ModuleColumns', [('id', 0), ('module_name', 1), ('description', 2)])
+			Enum('ModuleColumns', [('id', 0), ('module_name', 1), ('description', 2), ('status', 3)])
 		
 		# Cohort Column ENUMS
 		self.CohortColumns = \
@@ -71,10 +71,9 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"WHERE students.cohort_id = cohorts.id;"
 		
 		self.SELECT_MODULES_FOR_STUDENT_ID = \
-			"SELECT modules.id, modules.module_name, modules.description " \
+			"SELECT modules.id, modules.module_name, modules.description, student_module_xref.status " \
 			"FROM modules, student_module_xref " \
-			"WHERE student_module_xref.student_id = %s " \
-			"AND student_module_xref.module_id = modules.id;"
+			"WHERE student_module_xref.module_id = modules.id AND student_module_xref.student_id = %s;"
 
 
 
@@ -91,7 +90,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			with connection:
 				cursor = connection.cursor()
 				with cursor:
-					cursor.execute(self.SELECT_ALL_STUDENTS)
+					cursor.execute(self.SELECT_STUDENTS_WITH_COHORTS)
 					results = cursor.fetchall()
 				students_list = self._pupulate_student_objects(results)
 			for student in students_list:
@@ -132,7 +131,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			with connection:
 				cursor = connection.cursor()
 				with cursor:
-					cursor.execute(self.SELECT_ALL_moduleS)
+					cursor.execute(self.SELECT_ALL_MODULES)
 					results = cursor.fetchall()
 				modules_list = self._populate_module_objects(results)
 			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Retrieved all modules')
@@ -193,6 +192,13 @@ class MySQLPersistenceWrapper(ApplicationBase):
 				student.first_name = row[self.StudentColumns['first_name'].value]
 				student.last_name = row[self.StudentColumns['last_name'].value]
 				student.email = row[self.StudentColumns['email'].value]
+				if row[self.StudentColumns['cohort_name'].value] is not None:
+					cohort = Cohort()
+					cohort.id = None
+					cohort.cohort_name = row[self.StudentColumns['cohort_name'].value]
+					cohort.start_date = row[self.StudentColumns['start_date'].value]
+					cohort.end_date = row[self.StudentColumns['end_date'].value]
+					student.cohort = cohort
 				students_list.append(student)
 			return students_list
 		except Exception as e:
@@ -228,6 +234,8 @@ class MySQLPersistenceWrapper(ApplicationBase):
 				module.id = row[self.ModuleColumns['id'].value]
 				module.module_name = row[self.ModuleColumns['module_name'].value]
 				module.description = row[self.ModuleColumns['description'].value]
+				if row[self.ModuleColumns['status'].value] is not None:
+					module.status = row[self.ModuleColumns['status'].value]
 				modules_list.append(module)
 			return modules_list
 		except Exception as e:
