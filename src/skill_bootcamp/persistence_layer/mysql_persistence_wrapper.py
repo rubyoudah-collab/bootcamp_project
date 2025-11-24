@@ -103,7 +103,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting all students: {e}')
 			return []
 	
-	def selct_all_cohorts(self)->List[Cohort]:
+	def select_all_cohorts(self)->List[Cohort]:
 		"""Selects all cohorts from the database."""
 		cursor = None
 		results = None
@@ -234,7 +234,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 				module.id = row[self.ModuleColumns['id'].value]
 				module.module_name = row[self.ModuleColumns['module_name'].value]
 				module.description = row[self.ModuleColumns['description'].value]
-				if row[self.ModuleColumns['status'].value] is not None:
+				if len(row) > 3:
 					module.status = row[self.ModuleColumns['status'].value]
 				modules_list.append(module)
 			return modules_list

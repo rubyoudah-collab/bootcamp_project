@@ -68,10 +68,22 @@ class ConsoleUI(ApplicationBase):
     def list_cohorts(self)->None:
         """ Listing all cohorts. """
         print("\tListing all cohorts...")
+        cohorts = self.app_services.get_all_cohorts()
+        cohorts_table = PrettyTable()
+        cohorts_table.field_names = ["ID", "Cohort Name", "Start Date", "End Date"]
+        for cohort in cohorts:
+            cohorts_table.add_row([cohort.id, cohort.cohort_name, cohort.start_date, cohort.end_date])
+        print(cohorts_table)
 
     def list_modules(self)->None:
         """ Listing all modules. """
         print("\tListing all modules...")
+        modules = self.app_services.get_all_modules()
+        modules_table = PrettyTable()
+        modules_table.field_names = ["ID", "Module Name", "Description"]
+        for module in modules:
+            modules_table.add_row([module.id, module.module_name, module.description])
+        print(modules_table)
 
     def add_student(self)->None:
         """ Add a new student. """

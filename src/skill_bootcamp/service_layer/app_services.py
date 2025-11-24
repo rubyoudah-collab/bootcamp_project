@@ -27,3 +27,29 @@ class AppServices(ApplicationBase):
             return results
         except Exception as ex:
             self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+
+    def get_all_cohorts(self):
+        """ Return a list of cohort objects. """
+
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: Retrieving all cohorts from database.")
+        cohort_dict = {}
+        cohort_dict['cohorts'] = []
+
+        try:
+            results = self.DB.select_all_cohorts()
+            return results
+        except Exception as ex:
+            self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+
+    def get_all_modules(self):
+        """ Return a list of module objects. """
+
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: Retrieving all modules from database.")
+        module_dict = {}
+        module_dict['modules'] = []
+
+        try:
+            results = self.DB.select_all_modules()
+            return results
+        except Exception as ex:
+            self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
