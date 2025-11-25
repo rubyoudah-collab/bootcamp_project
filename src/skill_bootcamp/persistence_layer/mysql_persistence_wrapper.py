@@ -57,6 +57,11 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"SELECT id, first_name, last_name, email " \
 			"FROM students;" \
 		
+		self.SELECT_STUDENT_BY_ID = \
+			"SELECT id, first_name, last_name, email " \
+			"FROM students "\
+			"WHERE id = %s;"
+		
 		self.SELECT_ALL_COHORTS = \
 			"SELECT id, cohort_name, start_date, end_date " \
 			"FROM cohorts;"
@@ -69,6 +74,11 @@ class MySQLPersistenceWrapper(ApplicationBase):
 		self.SELECT_ALL_MODULES = \
 			"SELECT id, module_name, description " \
 			"FROM modules;"
+		
+		self.SELECT_MODULE_BY_ID = \
+			"SELECT id, module_name, description " \
+			"FROM modules " \
+			"WHERE id = %s;"
 		
 		self.SELECT_STUDENTS_WITH_COHORTS = \
 			"SELECT students.id, first_name, last_name, email, cohort_name, start_date, end_date " \
@@ -92,7 +102,9 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"INSERT INTO modules (module_name, description) " \
 			"VALUES (%s, %s);"
 
-
+		self.RECORD_STUDENT_MODULE = \
+			"INSERT INTO student_module_xref (student_id, module_id, status) " \
+			"VALUES (%s, %s, %s);"
 
 
 
@@ -179,6 +191,33 @@ class MySQLPersistenceWrapper(ApplicationBase):
 
 		##### Private Utility Methods #####
 
+	def select_a_student_by_id(self, student_id:int)->Student:
+		"""Selects a student by ID from the database."""
+		cursor = None
+		result = None
+		student = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.SELECT_STUDENT_BY_ID, (student_id,))
+					result = cursor.fetchone()
+				if result is not None:
+					student = Student()
+					student.id = result[self.StudentColumns['id'].value]
+					student.first_name = result[self.StudentColumns['first_name'].value]
+					student.last_name = result[self.StudentColumns['last_name'].value]
+					student.email = result[self.StudentColumns['email'].value]
+				else:
+					self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: No student found with ID {student_id}')
+					return None
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Retrieved student by ID {student_id}')
+			return student
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting student by ID {student_id}: {e}')
+			return None
+
 	def select_a_cohort_by_id(self, cohort_id:int)->Cohort:
 		"""Selects a cohort by ID from the database."""
 		cursor = None
@@ -204,6 +243,32 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			return cohort
 		except Exception as e:
 			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting cohort by ID {cohort_id}: {e}')
+			return None
+		
+	def select_a_module_by_id(self, module_id:int)->Module:
+		"""Selects a module by ID from the database."""
+		cursor = None
+		result = None
+		module = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.SELECT_MODULE_BY_ID, (module_id,))
+					result = cursor.fetchone()
+				if result is not None:
+					module = Module()
+					module.id = result[self.ModuleColumns['id'].value]
+					module.module_name = result[self.ModuleColumns['module_name'].value]
+					module.description = result[self.ModuleColumns['description'].value]
+				else:
+					self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: No module found with ID {module_id}')
+					return None
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Retrieved module by ID {module_id}')
+			return module
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting module by ID {module_id}: {e}')
 			return None
 
 	def insert_student(self, student:Student)->Student:
@@ -250,6 +315,22 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			return module
 		except Exception as e:
 			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem inserting new module: {e}')
+
+	def record_student_module_completion(self, student:Student, module:Module, status:str)->bool:
+		"""Records the completion status of a module for a student."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.RECORD_STUDENT_MODULE, (student.id, module.id, status))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Recorded module completion for student ID {student.id} and module ID {module.id}')
+			return True
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem recording module completion for student ID {student.id} and module ID {module.id}: {e}')
+			return False
 
 	def _initialize_database_connection_pool(self, config:dict)->MySQLConnectionPool:
 		"""Initializes database connection pool."""

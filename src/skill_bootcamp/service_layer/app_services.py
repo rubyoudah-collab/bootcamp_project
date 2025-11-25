@@ -105,3 +105,23 @@ class AppServices(ApplicationBase):
             return module
         except Exception as ex:
             self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+
+    def record_student_module_completion(self, student_id:int, module_id:int, status:str)->bool:
+        """ Record the completion status of a module for a student. """
+
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: Recording module completion for student ID {student_id} and module ID {module_id}.")
+
+        try:
+            student = self.DB.select_a_student_by_id(student_id)
+            if student is None:
+                self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Student ID {student_id} does not exist.")
+                return False
+            module = self.DB.select_a_module_by_id(module_id)
+            if module is None:
+                self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Module ID {module_id} does not exist.")
+                return False
+            result = self.DB.record_student_module_completion(student, module, status)
+            return result
+        except Exception as ex:
+            self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+            return False

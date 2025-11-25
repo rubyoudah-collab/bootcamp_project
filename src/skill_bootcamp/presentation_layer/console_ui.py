@@ -28,9 +28,8 @@ class ConsoleUI(ApplicationBase):
         print(f"\t4. Add Student")
         print(f"\t5. Add Cohort")
         print(f"\t6. Add Module")
-        print(f"\t7. Record Student Cohort")
-        print(f"\t8. Record Student Module")
-        print(f"\t9. Exit")
+        print(f"\t7. Record Student Module")
+        print(f"\t8. Exit")
         print()
 
     def process_menu_choice(self)->None:
@@ -132,6 +131,17 @@ class ConsoleUI(ApplicationBase):
     def record_student_module(self)->None:
         """ Record a student module. """
         print("\tRecording a student module...")
+        try:
+            student_id = int(input("\tEnter Student ID: "))
+            module_id = int(input("\tEnter Module ID: "))
+            status = input("\tEnter Status (e.g., Completed, In Progress, Pending): ")
+            success = self.app_services.record_student_module_completion(student_id, module_id, status)
+            if success:
+                print(f"\tRecorded module for student with status '{status}'.")
+            else:
+                self._logger.log_error(f"Failed to record module for student.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
 
     def start(self)->None:
         while True:
