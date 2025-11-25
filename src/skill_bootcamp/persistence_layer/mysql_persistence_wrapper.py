@@ -61,6 +61,11 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"SELECT id, cohort_name, start_date, end_date " \
 			"FROM cohorts;"
 		
+		self.SELECT_A_COHORT_BY_ID = \
+			"SELECT id, cohort_name, start_date, end_date " \
+			"FROM cohorts " \
+			"WHERE id = %s;"
+		
 		self.SELECT_ALL_MODULES = \
 			"SELECT id, module_name, description " \
 			"FROM modules;"
@@ -74,6 +79,18 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"SELECT modules.id, modules.module_name, modules.description, student_module_xref.status " \
 			"FROM modules, student_module_xref " \
 			"WHERE student_module_xref.module_id = modules.id AND student_module_xref.student_id = %s;"
+		
+		self.INSERT_STUDENT = \
+			"INSERT INTO students (first_name, last_name, email, cohort_id) " \
+			"VALUES (%s, %s, %s, %s);"
+		
+		self.INSERT_COHORT = \
+			"INSERT INTO cohorts (cohort_name, start_date, end_date) " \
+			"VALUES (%s, %s, %s);"
+		
+		self.INSERT_MODULE = \
+			"INSERT INTO modules (module_name, description) " \
+			"VALUES (%s, %s);"
 
 
 
@@ -161,6 +178,78 @@ class MySQLPersistenceWrapper(ApplicationBase):
 
 
 		##### Private Utility Methods #####
+
+	def select_a_cohort_by_id(self, cohort_id:int)->Cohort:
+		"""Selects a cohort by ID from the database."""
+		cursor = None
+		result = None
+		cohort = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.SELECT_A_COHORT_BY_ID, (cohort_id,))
+					result = cursor.fetchone()
+				if result is not None:
+					cohort = Cohort()
+					cohort.id = result[self.CohortColumns['id'].value]
+					cohort.cohort_name = result[self.CohortColumns['cohort_name'].value]
+					cohort.start_date = result[self.CohortColumns['start_date'].value]
+					cohort.end_date = result[self.CohortColumns['end_date'].value]
+				else:
+					self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: No cohort found with ID {cohort_id}')
+					return None
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Retrieved cohort by ID {cohort_id}')
+			return cohort
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting cohort by ID {cohort_id}: {e}')
+			return None
+
+	def insert_student(self, student:Student)->Student:
+		"""Inserts a new student into the database."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.INSERT_STUDENT, ([student.first_name, student.last_name, student.email, student.cohort.id]))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Inserted new student')
+			return student
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem inserting new student: {e}')
+
+	def insert_cohort(self, cohort:Cohort)->Cohort:
+		"""Inserts a new cohort into the database."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.INSERT_COHORT, ([cohort.cohort_name, cohort.start_date, cohort.end_date]))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Inserted new cohort')
+			return cohort
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem inserting new cohort: {e}')
+
+	def insert_module(self, module:Module)->Module:
+		"""Inserts a new module into the database."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.INSERT_MODULE, ([module.module_name, module.description]))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Inserted new module')
+			return module
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem inserting new module: {e}')
 
 	def _initialize_database_connection_pool(self, config:dict)->MySQLConnectionPool:
 		"""Initializes database connection pool."""

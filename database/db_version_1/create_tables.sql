@@ -22,8 +22,8 @@ DROP TABLE IF EXISTS `cohorts`;
 CREATE TABLE IF NOT EXISTS `cohorts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cohort_name` varchar(100) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
+  `start_date` varchar(100) NOT NULL,
+  `end_date` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

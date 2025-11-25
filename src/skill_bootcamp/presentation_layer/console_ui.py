@@ -35,7 +35,7 @@ class ConsoleUI(ApplicationBase):
 
     def process_menu_choice(self)->None:
         """ Process users menu choice. """
-        choice = input("\tEnter your choice (1-9): ")
+        choice = input("\tEnter your choice (1-8): ")
 
         match choice:
             case '1': self.list_students()
@@ -44,9 +44,8 @@ class ConsoleUI(ApplicationBase):
             case '4': self.add_student()
             case '5': self.add_cohort()
             case '6': self.add_module()
-            case '8': self.record_student_cohort()
-            case '8': self.record_student_module()
-            case '9': sys.exit(0)
+            case '7': self.record_student_module()
+            case '8': sys.exit(0)
             case _: print("\tInvalid Menu choice {choice}. Please try again.")
 
     def list_students(self)->None:
@@ -88,18 +87,47 @@ class ConsoleUI(ApplicationBase):
     def add_student(self)->None:
         """ Add a new student. """
         print("\tAdding a new student...")
+        try:
+            first_name = input("\tEnter First Name: ")
+            last_name = input("\tEnter Last Name: ")
+            email = input("\tEnter Email: ")
+            cohort_id = int(input("\tEnter Cohort ID: "))
+            student = self.app_services.insert_student(first_name, last_name, email, cohort_id)
+            if student is not None:
+                print(f"\tStudent added with Name: {first_name} {last_name}")
+            else:
+                self._logger.log_error(f"Failed to add student {first_name} {last_name}.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
 
     def add_cohort(self)->None:
         """ Add a new cohort. """
         print("\tAdding a new cohort...")
+        try:
+            cohort_name = input("\tEnter Cohort Name: ")
+            start_date = input("\tEnter Start Date (YYYY-MM-DD): ")
+            end_date = input("\tEnter End Date (YYYY-MM-DD): ")
+            cohort = self.app_services.insert_cohort(cohort_name, start_date, end_date)
+            if cohort is not None:
+                print(f"\tCohort added with Name: {cohort_name}")
+            else:
+                self._logger.log_error(f"Failed to add cohort {cohort_name}.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
 
     def add_module(self)->None:
         """ Add a new module. """
         print("\tAdding a new module...")
-
-    def record_student_cohort(self)->None:
-        """ Record a student cohort. """
-        print("\tRecording a student cohort...")
+        try:
+            module_name = input("\tEnter Module Name: ")
+            description = input("\tEnter Module Description: ")
+            module = self.app_services.insert_module(module_name, description)
+            if module is not None:
+                print(f"\tModule added with Name: {module_name}.")
+            else:
+                self._logger.log_error(f"Failed to add module {module_name}.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
 
     def record_student_module(self)->None:
         """ Record a student module. """
