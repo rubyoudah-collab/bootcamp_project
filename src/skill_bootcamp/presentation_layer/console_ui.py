@@ -26,25 +26,29 @@ class ConsoleUI(ApplicationBase):
         print(f"\t2. List all cohorts")
         print(f"\t3. List all modules")
         print(f"\t4. Add Student")
-        print(f"\t5. Add Cohort")
-        print(f"\t6. Add Module")
-        print(f"\t7. Record Student Module")
-        print(f"\t8. Exit")
+        print(f"\t5. Update Student")
+        print(f"\t6. Delete Student")
+        print(f"\t7. Add Cohort")
+        print(f"\t8. Add Module")
+        print(f"\t9. Record Student Module")
+        print(f"\t10. Exit")
         print()
 
     def process_menu_choice(self)->None:
         """ Process users menu choice. """
-        choice = input("\tEnter your choice (1-8): ")
+        choice = input("\tEnter your choice (1-10): ")
 
         match choice:
             case '1': self.list_students()
             case '2': self.list_cohorts()
             case '3': self.list_modules()
             case '4': self.add_student()
-            case '5': self.add_cohort()
-            case '6': self.add_module()
-            case '7': self.record_student_module()
-            case '8': sys.exit(0)
+            case '5': self.update_student()
+            case '6': self.delete_student()
+            case '7': self.add_cohort()
+            case '8': self.add_module()
+            case '9': self.record_student_module()
+            case '10': sys.exit(0)
             case _: print("\tInvalid Menu choice {choice}. Please try again.")
 
     def list_students(self)->None:
@@ -96,6 +100,36 @@ class ConsoleUI(ApplicationBase):
                 print(f"\tStudent added with Name: {first_name} {last_name}")
             else:
                 self._logger.log_error(f"Failed to add student {first_name} {last_name}.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
+
+    def update_student(self)->None:
+        """ Update an existing student. """
+        print("\tUpdating an existing student...")
+        try:
+            student_id = int(input("\tEnter Student ID to update: "))
+            first_name = input("\tEnter New First Name: ")
+            last_name = input("\tEnter New Last Name: ")
+            email = input("\tEnter New Email: ")
+            cohort_id = int(input("\tEnter New Cohort ID: "))
+            student = self.app_services.update_student(student_id, first_name, last_name, email, cohort_id)
+            if student is not None:
+                print(f"\tStudent updated with ID: {student_id}")
+            else:
+                self._logger.log_error(f"Failed to update student with ID {student_id}.")
+        except Exception as ex:
+            self._logger.log_error(f"Exception occurred: {ex}")
+
+    def delete_student(self)->None:
+        """ Delete a student. """
+        print("\tDeleting a student...")
+        try:
+            student_id = int(input("\tEnter Student ID to delete: "))
+            success = self.app_services.delete_student(student_id)
+            if success:
+                print(f"\tStudent deleted with ID: {student_id}")
+            else:
+                self._logger.log_error(f"Failed to delete student with ID {student_id}.")
         except Exception as ex:
             self._logger.log_error(f"Exception occurred: {ex}")
 

@@ -94,6 +94,15 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			"INSERT INTO students (first_name, last_name, email, cohort_id) " \
 			"VALUES (%s, %s, %s, %s);"
 		
+		self.UPDATE_STUDENT = \
+			"UPDATE students " \
+			"SET first_name = %s, last_name = %s, email = %s, cohort_id = %s " \
+			"WHERE id = %s;"
+		
+		self.DELETE_STUDENT = \
+			"DELETE FROM students " \
+			"WHERE id = %s;"
+		
 		self.INSERT_COHORT = \
 			"INSERT INTO cohorts (cohort_name, start_date, end_date) " \
 			"VALUES (%s, %s, %s);"
@@ -244,7 +253,7 @@ class MySQLPersistenceWrapper(ApplicationBase):
 		except Exception as e:
 			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem selecting cohort by ID {cohort_id}: {e}')
 			return None
-		
+	
 	def select_a_module_by_id(self, module_id:int)->Module:
 		"""Selects a module by ID from the database."""
 		cursor = None
@@ -285,6 +294,37 @@ class MySQLPersistenceWrapper(ApplicationBase):
 			return student
 		except Exception as e:
 			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem inserting new student: {e}')
+
+	def update_student(self, student:Student)->Student:
+		"""Updates an existing student in the database."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.UPDATE_STUDENT, ([student.first_name, student.last_name, student.email, student.cohort.id, student.id]))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Updated student with ID {student.id}')
+			return student
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem updating student with ID {student.id}: {e}')
+
+	def delete_student(self, student_id:int)->bool:
+		"""Deletes a student from the database."""
+		cursor = None
+		try:
+			connection = self._connection_pool.get_connection()
+			with connection:
+				cursor = connection.cursor()
+				with cursor:
+					cursor.execute(self.DELETE_STUDENT, (student_id,))
+					connection.commit()
+			self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: Deleted student with ID {student_id}')
+			return True
+		except Exception as e:
+			self._logger.log_error(f'{inspect.currentframe().f_code.co_name}: Problem deleting student with ID {student_id}: {e}')
+			return False
 
 	def insert_cohort(self, cohort:Cohort)->Cohort:
 		"""Inserts a new cohort into the database."""

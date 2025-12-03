@@ -77,6 +77,44 @@ class AppServices(ApplicationBase):
         except Exception as ex:
             self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
 
+    def update_student(self, student_id:int, first_name:str, last_name:str, email:str, cohort_id:int)->Student:
+        """ Update a student object in the database. """
+
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: Updating student in database.")
+
+        try:
+            student = self.DB.select_a_student_by_id(student_id)
+            if student is None:
+                self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Student ID {student_id} does not exist.")
+                return None
+            student.first_name = first_name
+            student.last_name = last_name
+            student.email = email
+            cohort = self.DB.select_a_cohort_by_id(cohort_id)
+            if cohort is None:
+                self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Cohort ID {cohort_id} does not exist.")
+                return None
+            student.cohort = cohort
+            student = self.DB.update_student(student)
+            return student
+        except Exception as ex:
+            self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+
+    def delete_student(self, student_id:int)->bool:
+        """ Delete a student object from the database. """
+
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: Deleting student with id {student_id} from database.")
+
+        try:
+            student = self.DB.select_a_student_by_id(student_id)
+            if student is None:
+                self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Student ID {student_id} does not exist.")
+                return False
+            result = self.DB.delete_student(student_id)
+            return result
+        except Exception as ex:
+            self._logger.log_error(f"{inspect.currentframe().f_code.co_name}: Exception occurred: {ex}")
+
     def insert_cohort(self, cohort_name:str, start_date:str, end_date:str)->Cohort:
         """ Insert a cohort object into the database. """
 
