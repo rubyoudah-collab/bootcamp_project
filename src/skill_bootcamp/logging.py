@@ -11,8 +11,17 @@ class LoggingService():
     def __init__(self, class_name:str, logfile_prefix_name:str=None)->None:
         """Initialize instance."""
         
-        self._logger = logging.getLogger(class_name)
-        self._logger.propagate = False
+        if logfile_prefix_name:
+            parent_logger_name = logfile_prefix_name
+            logger_name = f"{logfile_prefix_name}.{class_name}"
+        else:
+            parent_logger_name = class_name
+            logger_name = class_name
+
+        self._logger = logging.getLogger(logger_name)
+        self._logger.propagate = True
+        self._parent_logger = logging.getLogger(parent_logger_name)
+        self._parent_logger.propagate = False
         self._settings_dict = Settings().read_settings_file_from_location()
         self._logfile_prefix_name = logfile_prefix_name
         self.log_level = logging.ERROR
@@ -42,14 +51,18 @@ class LoggingService():
         self._formatter = \
                 logging.Formatter('%(levelname)s:%(name)s:%(asctime)s:%(message)s')
 
-        if not self._logger.handlers:
-            if self._settings_dict['log_to_console']:
+        if not self._parent_logger.handlers:
+            if self._settings_dict.get('log_to_console'):
                 self._ch = logging.StreamHandler()
                 self._ch.setLevel(logging.DEBUG)
                 self._ch.setFormatter(self._formatter)
-                self._logger.addHandler(self._ch)
+                self._parent_logger.addHandler(self._ch)
 
-            if self._settings_dict['log_to_file']:
+            if self._settings_dict.get('log_to_file'):
+                try:
+                    os.makedirs(self._settings_dict['logs_dir'], exist_ok=True)
+                except Exception:
+                    pass
                 log_file = os.path.join(self._settings_dict['logs_dir'], 
                             f"{self._logfile_prefix_name}_" \
                             f"{self._settings_dict['log_filename']}")
@@ -57,7 +70,7 @@ class LoggingService():
                             when='midnight', backupCount=20)
                 self._fh.setLevel(logging.DEBUG)
                 self._fh.setFormatter(self._formatter)
-                self._logger.addHandler(self._fh)
+                self._parent_logger.addHandler(self._fh)
         
 
     
